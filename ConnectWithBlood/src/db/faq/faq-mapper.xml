@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+	<entry key="selectFaqList">
+		SELECT FAQ_NO
+      		  ,FAQ_TITLE
+     	      ,FAQ_CONTENT
+              ,FAQ_DATE
+	    FROM FAQ
+		WHERE FAQ_STATUS ='Y'
+	</entry>
+	
+</properties>

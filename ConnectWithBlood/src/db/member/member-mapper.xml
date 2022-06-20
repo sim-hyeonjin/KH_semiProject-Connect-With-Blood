@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+		<entry key="enrollMember">
+        		INSERT INTO MEMBER(USER_NO,
+						USER_ID,
+						USER_PW,
+						USER_NAME,
+						USER_BIRTH,
+						USER_EMAIL,
+						USER_PHONE,
+						USER_ADDRESS,
+						USER_BLOODTYPE) 
+						VALUES 
+						(SEQ_UNO.NEXTVAL,
+                   		?,
+                    	?,
+                    	?,
+                    	?,
+                    	?,
+                      	?,
+                    	?,
+                    	?)
+	</entry> 
+	<!-- 디폴트 들어가있는건 빼~ -->
+	
+
+		
+	
+
+	<entry key="loginMember">
+        SELECT *
+        FROM MEMBER
+		JOIN BLOODINFO ON(USER_NO=BLOOD_OWNER)
+		WHERE USER_ID=?
+		AND USER_PW=?
+		AND USER_STATUS='NORMAL'
+	</entry>
+	
+	<entry key="updateBloodInfo">
+		INSERT INTO "SEMI"."BLOODINFO"
+		(BLOOD_NO, BLOOD_WH, BLOOD_OWNER) 
+		VALUES (?
+				, ?
+				, (SELECT BLOOD_OWNER 
+					FROM BLOODINFO 
+					LEFT JOIN MEMBER ON (BLOOD_OWNER=USER_NO)
+					WHERE USER_NO in ?
+                    AND USER_STATUS in 'NORMAL'))
+	</entry>
+	
+	<entry key="selectBloodInfo">
+		 SELECT BLOOD_WH
+	     FROM BLOODINFO LEFT JOIN MEMBER ON (BLOOD_OWNER=USER_NO)
+		 WHERE USER_ID = ?
+	     AND USER_STATUS = 'NORMAL'
+	</entry>
+	
+	<entry key="selectUserNo">
+		SELECT USER_NO
+        FROM MEMBER
+        WHERE USER_ID=?
+	</entry>
+	
+	<entry key="findId">
+		SELECT USER_ID
+		FROM MEMBER
+		WHERE USER_NAME=?
+		AND USER_EMAIL=?
+		AND   USER_STATUS='NORMAL'
+	</entry>
+	
+	<entry key="findPw">
+		SELECT USER_PW
+		FROM MEMBER
+		WHERE USER_ID=? 
+		AND USER_NAME=?
+		AND USER_EMAIL=? 
+		AND   USER_STATUS='NORMAL'
+	</entry>
+	
+	<entry key="updateMem">
+		UPDATE MEMBER
+		SET 	USER_PW = ?
+				,USER_NAME=?
+                ,USER_EMAIL = ?
+                ,USER_PHONE=?
+                ,USER_ADDRESS = ?
+		WHERE 	USER_ID = ?
+		AND   USER_STATUS='NORMAL'
+	</entry>
+	
+	<entry key="selectMem">
+		SELECT * 
+		FROM MEMBER
+		WHERE USER_ID =?
+		AND   USER_STATUS='NORMAL'
+	</entry>
+
+	<entry key="deleteMember">
+		UPDATE MEMBER SET USER_STATUS='WITHDRAWAL'
+						, USER_WITHDATE=SYSDATE 
+		WHERE USER_ID=? 
+		AND USER_PW=?
+	</entry>
+	
+	
+	
+		<!-- AJAX -->
+	<entry key="idCheck">
+		SELECT COUNT(*) COUNT 
+		FROM MEMBER 
+		WHERE USER_ID = ?
+	</entry>
+	
+	<!-- 규민 회원정보 띄우기 -->
+	<entry key="selectMemberList">
+	SELECT * 
+   	 FROM(
+       	 SELECT ROWNUM RNUM,A.*
+         FROM
+            (
+		SELECT USER_NO
+			, USER_ID
+			, USER_PW
+			, USER_NAME
+			, USER_BIRTH
+			, USER_PHONE
+			, USER_EMAIL
+			, USER_ADDRESS
+			, USER_ENROLLDATE
+			, USER_STATUS
+			, USER_GRADE
+			, USER_BLOODTYPE
+			, USER_LOGINDATE <!-- 회원로그인 날짜 -->
+			, USER_WITHDATE <!-- 회원탈퇴 날짜 -->
+			, USER_SUSDATE  <!-- 회원정지/블랙리스트 날짜  -->
+	  	FROM MEMBER 
+	  	 ) A
+          )
+	WHERE RNUM BETWEEN ? AND ?
+	</entry>         
+	<!-- 규민 회원상태(정보띄우기) 끝 -->
+	
+	<!-- 규민 회원정보 페이징처리 시작 -->
+	<entry key="selectListCount">
+		SELECT COUNT(*) COUNT
+		FROM MEMBER
+	</entry>
+	
+	
+	<entry key="selectList">
+	SELECT * 
+   	 FROM(
+       	 SELECT ROWNUM RNUM,A.*
+         FROM
+            (
+            SELECT USER_NO
+			, USER_ID
+			, USER_PW
+			, USER_NAME
+			, USER_BIRTH
+			, USER_PHONE
+			, USER_EMAIL
+			, USER_ADDRESS
+			, USER_ENROLLDATE
+			, USER_STATUS
+			, USER_GRADE
+			, USER_BLOODTYPE
+			, USER_LOGINDATE <!-- 회원로그인 날짜 -->
+			, USER_WITHDATE <!-- 회원탈퇴 날짜 -->
+			, USER_SUSDATE  <!-- 회원정지/블랙리스트 날짜  -->
+	  	FROM MEMBER 
+             ) A
+          )
+	WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 규민 회원정보 페이징처리 끝 -->
+	
+	
+	<!-- 규민 회원정보 수정(상태,등급) 시작 -->
+ 	<entry key="modifyMember">
+		UPDATE MEMBER
+		SET USER_STATUS = ?
+			,USER_GRADE = ?
+		WHERE USER_ID = ?
+			
+	</entry> 	
+	<!-- 규민 회원정보 수정(상태,등급) 끝-->
+	
+	<!-- 규민 회원 이름 검색 시작 -->
+	<entry key="selectMemberUserNameFindList">
+	SELECT * 
+   	 FROM(
+       	 SELECT ROWNUM RNUM,A.*
+         FROM
+            (
+		SELECT USER_NO
+			, USER_ID
+			, USER_PW
+			, USER_NAME
+			, USER_BIRTH
+			, USER_PHONE
+			, USER_EMAIL
+			, USER_ADDRESS
+			, USER_ENROLLDATE
+			, USER_STATUS
+			, USER_GRADE
+			, USER_BLOODTYPE
+			, USER_LOGINDATE <!-- 회원로그인 날짜 -->
+			, USER_WITHDATE <!-- 회원탈퇴 날짜 -->
+			, USER_SUSDATE  <!-- 회원정지/블랙리스트 날짜  -->
+		FROM MEMBER
+		WHERE USER_NAME = ? <!-- 원래는 LIKE 절을 쓰는게 맞는데, 수업 플젝에도 없는거 보니까.. 그냥 =으로  -->
+		  ) A
+          )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 규민 회원 이름 검색 끝 -->
+	
+	<!-- 규민 회원 등급 검색  시작 -->
+	<entry key="selectMemberUserGradeFindList">
+	SELECT * 
+   	 FROM(
+       	 SELECT ROWNUM RNUM,A.*
+         FROM
+            (
+		SELECT USER_NO
+			, USER_ID
+			, USER_PW
+			, USER_NAME
+			, USER_BIRTH
+			, USER_PHONE
+			, USER_EMAIL
+			, USER_ADDRESS
+			, USER_ENROLLDATE
+			, USER_STATUS
+			, USER_GRADE
+			, USER_BLOODTYPE
+			, USER_LOGINDATE <!-- 회원로그인 날짜 -->
+			, USER_WITHDATE <!-- 회원탈퇴 날짜 -->
+			, USER_SUSDATE  <!-- 회원정지/블랙리스트 날짜  -->
+		FROM MEMBER
+		WHERE USER_GRADE = ? 
+		  ) A
+          )
+	WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 규민 회원 등급 검색  끝 -->
+
+	<!-- 규민 회원 아이디 검색 시작 -->
+	<entry key="selectMemberUserIdFindList">
+	SELECT * 
+   	 FROM(
+       	 SELECT ROWNUM RNUM,A.*
+         FROM
+            (
+		SELECT USER_NO
+			, USER_ID
+			, USER_PW
+			, USER_NAME
+			, USER_BIRTH
+			, USER_PHONE
+			, USER_EMAIL
+			, USER_ADDRESS
+			, USER_ENROLLDATE
+			, USER_STATUS
+			, USER_GRADE
+			, USER_BLOODTYPE
+			, USER_LOGINDATE <!-- 회원로그인 날짜 -->
+			, USER_WITHDATE <!-- 회원탈퇴 날짜 -->
+			, USER_SUSDATE  <!-- 회원정지/블랙리스트 날짜  -->
+		FROM MEMBER
+		WHERE USER_ID = ?	
+		  ) A
+          )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<!-- 규민 회원 아이디 검색 끝 -->
+	
+
+	<!-- 규민 회원현황 / 금일,이번달의 신규,정지,탈퇴 회원 -->
+	
+	<!-- 금일 신규회원현황의 COUNT를 조회한다. -->
+	<entry key="selectTodayNewMemberCnt">
+	SELECT COUNT(*) AS TODAY_MEMBER_COUNT
+		FROM MEMBER
+	WHERE TO_CHAR(USER_ENROLLDATE,'yyyy-mm-dd') = To_char(SYSDATE, 'yyyy-mm-dd') <!-- 회원가입일자가 오늘인지 여부 CHECK -->
+		AND USER_STATUS = 'NORMAL'   <!-- 회원상태가 정상인지 여부 CHECK -->
+	</entry>
+	
+	<!-- 이번달 신규회원현황의 COUNT를 조회한다. -->
+	<entry key="selectMonthNewMemberCnt">
+	SELECT COUNT(*) AS MONTH_NEWMEMBER_COUNT
+		FROM MEMBER                                                 
+	WHERE TO_CHAR(USER_ENROLLDATE,'YYYYMMDD') 
+		BETWEEN (TO_CHAR(TRUNC(SYSDATE,'MM'),'YYYYMMDD'))
+		AND TO_CHAR(LAST_DAY(SYSDATE),'YYYYMMDD')
+		AND USER_STATUS = 'NORMAL' <!-- 회원상태가 정상인지 여부 CHECK -->
+	</entry>
+	
+	<!-- 금일 탈퇴회원현황의 COUNT를 조회한다. -->
+	<entry key="selectTodayDelMemberCnt">
+	SELECT COUNT(*) AS TODAY_DELMEMBER_COUNT
+		FROM MEMBER
+	WHERE TO_CHAR(USER_WITHDATE,'yyyy-mm-dd') = To_char(SYSDATE, 'yyyy-mm-dd') <!-- 회원탈퇴일자가 오늘인지 여부 CHECK -->
+		AND USER_STATUS = 'WITHDRAWAL'   <!-- 회원상태가 탈퇴인지 여부 CHECK -->
+	</entry>
+	
+	<!-- 이번달 탈퇴회원현황의 COUNT를 조회한다. -->
+	<entry key="selectMonthDelMemberCnt">
+	SELECT COUNT(*) AS MONTH_DELMEMBER_COUNT
+		FROM MEMBER                                                 
+	WHERE TO_CHAR(USER_ENROLLDATE,'YYYYMMDD') 
+		BETWEEN (TO_CHAR(TRUNC(SYSDATE,'MM'),'YYYYMMDD'))
+		AND TO_CHAR(LAST_DAY(SYSDATE),'YYYYMMDD')
+	    AND USER_STATUS = 'WITHDRAWAL' <!-- 회원상태가 정상인지 여부 CHECK -->
+	</entry>
+	
+	<!-- 금일 정지회원현황의 COUNT를 조회한다. -->
+	<entry key="selectTodayStopMemberCnt">
+	SELECT COUNT(*) AS TODAY_STOPMEMBER_COUNT
+		FROM MEMBER
+	WHERE TO_CHAR(USER_SUSDATE,'yyyy-mm-dd') = To_char(SYSDATE, 'yyyy-mm-dd') <!-- 회원탈퇴일자가 오늘인지 여부 CHECK -->
+		AND USER_STATUS = 'SUSPENSION'   <!-- 회원상태가 탈퇴인지 여부 CHECK -->
+	</entry>
+	
+		<!-- 이번달 정지회원현황의 COUNT를 조회한다. -->
+	<entry key="selectMonthStopMemberCnt">
+	SELECT COUNT(*) AS MONTH_STOPMEMBER_COUNT
+		FROM MEMBER                                                 
+	WHERE TO_CHAR(USER_SUSDATE,'YYYYMMDD') 
+		BETWEEN (TO_CHAR(TRUNC(SYSDATE,'MM'),'YYYYMMDD'))    
+	    AND TO_CHAR(LAST_DAY(SYSDATE),'YYYYMMDD')
+	    AND USER_STATUS = 'SUSPENSION' <!-- 회원상태가 정상인지 여부 CHECK -->
+	</entry>
+	<!-- 규민 회원현황 / 금일,이번달의 신규,정지,탈퇴 회원 끝! -->		
+	
+</properties>

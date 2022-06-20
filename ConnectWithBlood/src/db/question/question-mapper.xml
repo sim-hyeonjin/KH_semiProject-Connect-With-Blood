@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<entry key="selectQnaCount">
+		SELECT COUNT(*) COUNT
+		FROM QUESTION
+		WHERE QUESTION_STATUS='Y'
+	</entry>
+
+
+	<entry key="selectQnaList">
+		SELECT * 
+    	FROM (
+        		SELECT ROWNUM RNUM,A.*
+        FROM 
+      	     (
+			      SELECT QUESTION_NO
+	      		  ,CATEGORY_NAME
+	     		  ,QUESTION_TITLE
+	 		      ,QUESTION_TAG
+	    		  ,QUESTION_DATE
+	     		  ,USER_NAME
+			FROM QUESTION Q
+			JOIN MEMBER ON (QUESTION_WRITER=USER_NO)
+			JOIN CATEGORY ON (QUESTION_TAG = CATEGORY_NO)
+			WHERE QUESTION_STATUS = 'Y'
+			ORDER BY QUESTION_NO DESC
+		
+            )   A
+            )
+			   WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+
+	<entry key="selectQue">
+		SELECT QUESTION_NO,QUESTION_TITLE,QUESTION_CONTENT,QUESTION_DATE,USER_NAME,CATEGORY_NAME
+		FROM QUESTION Q
+		JOIN MEMBER ON (QUESTION_WRITER=USER_NO)
+		JOIN CATEGORY ON (QUESTION_TAG = CATEGORY_NO)
+		WHERE QUESTION_NO = ?
+		AND QUESTION_STATUS = 'Y'
+	</entry>
+	
+	<entry key="selectCategoryList">
+		SELECT CATEGORY_NO,CATEGORY_NAME 
+		FROM CATEGORY
+		WHERE CATEGORY_NO BETWEEN 4 AND 7
+	
+	</entry>
+	
+	<entry key="insertQue">
+		INSERT INTO QUESTION(QUESTION_NO
+							,QUESTION_TITLE
+							,QUESTION_CONTENT
+							,QUESTION_TAG
+							,QUESTION_WRITER)
+		VALUES(
+							SEQ_QNO.NEXTVAL
+							,?
+							,?
+							,?
+							,?)
+	</entry>
+	
+	<entry key="insertAttachment">
+		INSERT INTO ATTACHMENT(FILE_NO
+								,REF_QNO
+								,ORIGIN_NAME
+								,CHANGE_NAME
+								,FILE_PATH)
+		VALUES(
+								SEQ_FILENO.NEXTVAL
+								,SEQ_QNO.CURRVAL
+								,?
+								,?
+								,?)
+							
+	</entry>
+	
+	<entry key="selectAttachment">
+	SELECT FILE_NO,ORIGIN_NAME,CHANGE_NAME,FILE_PATH
+	FROM ATTACHMENT
+	WHERE REF_QNO = ?
+	</entry>
+	
+	<entry key="updateQuestion">
+	UPDATE QUESTION
+	SET QUESTION_TAG = ?
+		,QUESTION_TITLE = ?
+		,QUESTION_CONTENT = ?
+	WHERE QUESTION_NO = ?
+	AND QUESTION_STATUS = 'Y'
+	
+	</entry>
+	
+	<entry key="updateAttachment">
+		UPDATE ATTACHMENT
+		SET ORIGIN_NAME = ?
+    	,CHANGE_NAME = ?
+    	,FILE_PATH = ?
+    	,UPLOAD_DATE = SYSDATE
+		WHERE FILE_NO = ?
+		AND STATUS='Y'
+	
+	</entry>
+	
+	<entry key="insertNewAttachment">
+	INSERT INTO ATTACHMENT(
+							FILE_NO
+							,REF_QNO
+							,ORIGIN_NAME
+							,CHANGE_NAME
+							,FILE_PATH
+							)
+	VALUES (SEQ_FILENO.NEXTVAL,?,?,?,?)
+	</entry>
+	
+	<entry key="deleteQuestion">
+	UPDATE QUESTION
+	SET QUESTION_STATUS = 'N'
+	WHERE QUESTION_NO = ?
+	
+	</entry>
+	
+	<entry key="insertReply">
+	INSERT INTO ANSWER (ANS_NO,ANS_CONTENT,ORIGIN_NO)
+	VALUES(SEQ_ANO.NEXTVAL,?,?)
+	
+	</entry>
+	<entry key="selectReplyList">
+	SELECT ANS_NO,ANS_CONTENT,TO_CHAR(ANS_DATE,'YY/MM/DD HH:MI:SS') ANS_DATE
+	FROM ANSWER
+	WHERE ORIGIN_NO = ?
+	</entry>
+</properties>

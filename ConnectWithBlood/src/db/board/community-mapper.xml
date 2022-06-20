@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+
+<properties>
+	<entry key="selectListCount">
+		SELECT COUNT(*) COUNT
+		FROM COMMUNITY
+		WHERE COMM_STATUS='Y'
+	</entry>
+
+	<entry key="selectCommunityList">
+		SELECT * 
+    	FROM (
+        		SELECT ROWNUM RNUM,A.*
+        FROM 
+      	     (
+	            SELECT COMM_NO,CATEGORY_NAME,COMM_TITLE,USER_NAME,COMM_COUNT,COMM_DATE
+	            FROM COMMUNITY C
+	            JOIN MEMBER ON (COMM_WRITER=USER_NO)
+	            JOIN CATEGORY USING(CATEGORY_NO)
+	            WHERE C.COMM_STATUS='Y'
+	            ORDER BY COMM_NO DESC
+            )   A
+            )
+			   WHERE RNUM BETWEEN ? AND ?
+
+	</entry>
+	
+	<entry key="increaseCount">
+		UPDATE COMMUNITY
+		SET COMM_COUNT = COMM_COUNT+1
+		WHERE COMM_NO = ?
+		AND COMM_STATUS='Y'
+	</entry>
+	
+	<entry key="selectComm">
+		SELECT COMM_NO,COMM_TITLE,COMM_CONTENT,COMM_DATE,USER_NAME,CATEGORY_NAME
+	    FROM COMMUNITY 
+	    JOIN MEMBER ON (COMM_WRITER=USER_NO)
+	    JOIN CATEGORY USING(CATEGORY_NO)
+	    WHERE COMM_NO = ?
+	    AND COMM_STATUS='Y'
+	</entry>
+	
+	<entry key="selectCategoryList">
+		SELECT CATEGORY_NO,CATEGORY_NAME 
+		FROM CATEGORY
+		WHERE CATEGORY_NO BETWEEN 1 AND 3
+	</entry>
+	
+	<entry key="insertComm">
+	INSERT INTO COMMUNITY(COMM_NO
+						,COMM_TITLE
+						,CATEGORY_NO
+						,COMM_CONTENT
+						,COMM_WRITER)
+	VALUES(
+						SEQ_CNO.NEXTVAL
+						,?
+						,?
+						,?
+						,?)
+	</entry>
+	
+	<entry key="insertAttachment">
+	INSERT INTO ATTACHMENT(FILE_NO
+							,REF_CNO
+							,ORIGIN_NAME
+							,CHANGE_NAME
+							,FILE_PATH)
+	VALUES(
+							SEQ_FILENO.NEXTVAL
+							,SEQ_CNO.CURRVAL
+							,?
+							,?
+							,?)	
+	</entry>
+	
+	<entry key="selectAttachment">
+	SELECT FILE_NO,ORIGIN_NAME,CHANGE_NAME,FILE_PATH
+	FROM ATTACHMENT
+	WHERE REF_CNO = ?
+	</entry>
+	
+	
+	<entry key="updateCommunity">
+	UPDATE COMMUNITY
+	SET CATEGORY_NO = ?
+    	,COMM_TITLE = ?
+    	,COMM_CONTENT = ?
+	WHERE COMM_NO = ?
+	AND COMM_STATUS = 'Y'
+	
+	</entry>
+	
+	<entry key="updateAttachment">
+	UPDATE ATTACHMENT
+	SET ORIGIN_NAME = ?
+    	,CHANGE_NAME = ?
+    	,FILE_PATH = ?
+    	,UPLOAD_DATE = SYSDATE
+	WHERE FILE_NO = ?
+	AND STATUS='Y'
+	</entry>
+	
+	<entry key="insertNewAttachment">
+	INSERT INTO ATTACHMENT(FILE_NO
+							,REF_CNO
+							,ORIGIN_NAME
+							,CHANGE_NAME
+							,FILE_PATH)
+	VALUES (SEQ_FILENO.NEXTVAL,?,?,?,?)
+	
+	</entry>
+
+	<entry key="deleteCommunity">
+	UPDATE COMMUNITY
+	SET COMM_STATUS = 'N'
+	WHERE COMM_NO = ?
+	</entry>
+	
+	<entry key="insertReply">
+	INSERT INTO REPLY(REPLY_NO,REPLY_CONTENT,REPLY_COMMNO,REPLY_WRITER)
+	VALUES (SEQ_REPLYNO.NEXTVAL,?,?,?)
+	</entry>
+	
+	<entry key="selectReplyList">
+	SELECT REPLY_NO,REPLY_CONTENT,USER_NAME,TO_CHAR(REPLY_DATE,'YY/MM/DD HH:MI:SS') REPLY_DATE
+	FROM REPLY R
+	JOIN MEMBER ON(REPLY_WRITER = USER_NO)
+	WHERE REPLY_STATUS = 'Y'
+	AND REPLY_COMMNO = ?
+	
+	</entry>
+	
+	<entry key="selectSearchTitleListCount">
+	SELECT COUNT(*) SCOUNT 
+	FROM COMMUNITY 
+	WHERE COMM_TITLE LIKE '%'||?||'%'
+	</entry>
+
+	<entry key="selectSearchListIdCount">
+	SELECT COUNT(*) SCOUNT 
+	FROM COMMUNITY 
+	JOIN MEMBER ON(COMM_WRITER = USER_NO)
+	WHERE USER_NAME LIKE '%'||?||'%' 
+	</entry>
+	
+	<entry key="selectSlistTitle">
+	SELECT * 
+    	FROM (
+        		SELECT ROWNUM RNUM,A.*
+        FROM 
+      	     (
+		        SELECT COMM_NO,CATEGORY_NAME,COMM_TITLE,USER_NAME,COMM_COUNT,COMM_DATE
+				FROM COMMUNITY JOIN MEMBER ON (COMM_WRITER=USER_NO)
+	           	JOIN CATEGORY USING(CATEGORY_NO)
+	            WHERE COMM_STATUS='Y'
+				AND COMM_TITLE LIKE '%'||?||'%'
+	            ORDER BY COMM_NO DESC
+            )   A
+            )
+			   WHERE RNUM BETWEEN ? AND ?
+	
+	</entry>
+	
+	<entry key="selectSlistId">
+	SELECT * 
+    	FROM (
+        		SELECT ROWNUM RNUM,A.*
+        FROM 
+      	     (
+		        SELECT COMM_NO,CATEGORY_NAME,COMM_TITLE,USER_NAME,COMM_COUNT,COMM_DATE
+				FROM COMMUNITY JOIN MEMBER ON (COMM_WRITER=USER_NO)
+	           	JOIN CATEGORY USING(CATEGORY_NO)
+	            WHERE COMM_STATUS='Y'
+				AND USER_NAME LIKE '%'||?||'%'
+	            ORDER BY COMM_NO DESC
+            )   A
+            )
+			   WHERE RNUM BETWEEN ? AND ?
+	
+	
+	</entry>
+</properties>

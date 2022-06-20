@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+	<entry key="enrollReservation">
+		INSERT INTO RESERVATION(RESERVATION_NO
+							   ,RESERVATION_WRITER
+							   ,RESERVATION_ADDRESS
+							   ,RESERVATION_ADDRESS2
+							   ,RESERVATION_DATE)
+			   VALUES(SEQ_RESERVNO.NEXTVAL
+			   		 ,?
+			   		 ,?
+			   		 ,?
+			   		 ,?)
+	</entry>
+	
+	<entry key="selectReservationList">
+         SELECT *
+	     FROM RESERVATION LEFT JOIN MEMBER ON (RESERVATION_WRITER=USER_NO)
+		 WHERE USER_NO = ?
+	     AND USER_STATUS = 'NORMAL'
+	</entry>
+	
+	
+</properties>

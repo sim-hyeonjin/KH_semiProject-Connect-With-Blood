@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+
+<properties>
+
+	<entry key="selectListCount">
+	SELECT COUNT(*) COUNT
+	FROM EVENT
+	WHERE EVENT_STATUS='Y'
+	</entry>
+
+
+	<entry key="SelectEventList">
+	SELECT * 
+    FROM (
+        SELECT ROWNUM RNUM,A.*
+        FROM 
+        (
+            SELECT EVENT_NO,EVENT_TITLE,EVENT_COUNT,EVENT_PROGRESS,EVENT_DATE
+			FROM EVENT E
+			JOIN ATTACHMENT ON(EVENT_NO = REF_ENO)
+			WHERE E.EVENT_STATUS = 'Y'
+
+			ORDER BY EVENT_NO DESC
+            ) A
+        )
+	WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="increaseCount">
+	UPDATE EVENT
+	SET EVENT_COUNT = EVENT_COUNT+1
+	WHERE EVENT_NO = ?
+	AND EVENT_STATUS = 'Y'
+	
+	
+	</entry>
+	
+	<entry key="selectEvent">
+	SELECT EVENT_NO,EVENT_TITLE,EVENT_CONTENT,EVENT_DATE,EVENT_PROGRESS
+	FROM EVENT
+	WHERE EVENT_NO = ?
+	AND EVENT_STATUS = 'Y'
+	
+	</entry>
+	
+	<entry key="insertEvent">
+	INSERT INTO EVENT(EVENT_NO
+						,EVENT_TITLE
+						,EVENT_CONTENT
+						)
+	VALUES(			SEQ_ENO.NEXTVAL
+					,?
+					,?)		
+	
+	</entry>
+	<entry key="insertAttachment">
+	INSERT INTO ATTACHMENT(FILE_NO
+							,REF_ENO
+							,ORIGIN_NAME
+							,CHANGE_NAME
+							,FILE_PATH
+							)
+	VALUES(
+			SEQ_FILENO.NEXTVAL
+			,SEQ_ENO.CURRVAL
+			,?
+			,?
+			,?
+			)
+			
+	
+	</entry>
+
+	<entry key="selectAttachment">
+	SELECT FILE_NO,ORIGIN_NAME,CHANGE_NAME,FILE_PATH
+	FROM ATTACHMENT
+	WHERE REF_ENO = ?
+
+	</entry>
+	
+	<entry key="selectAttachmentlist">
+	SELECT FILE_NO,ORIGIN_NAME,CHANGE_NAME,FILE_PATH
+	FROM ATTACHMENT
+	WHERE REF_ENO = ?
+	</entry>
+	
+	<entry key="updateEvent">
+	UPDATE EVENT
+	SET EVENT_TITLE = ?
+		,EVENT_CONTENT = ?
+	WHERE EVENT_NO = ?
+	AND EVENT_STATUS = 'Y'
+	
+	</entry>
+	
+	<entry key="updateAttachment">
+	UPDATE ATTACHMENT
+	SET ORIGIN_NAME = ?
+		,CHANGE_NAME = ?
+		,FILE_PATH = ?
+		,UPLOAD_DATE = SYSDATE
+	WHERE FILE_NO = ?
+	AND STATUS = 'Y'
+	</entry>
+	
+	<entry key="insertNewAttachment">
+	INSERT INTO ATTACHMENT(FILE_NO
+							,REF_CNO
+							,ORIGIN_NAME
+							,CHANGE_NAME
+							,FILE_PATH)
+	VALUES (SEQ_FILENO.NEXTVAL,?,?,?,?)
+	
+	
+	</entry>
+	
+	<entry key="deleteEvent">
+	UPDATE EVENT
+	SET EVENT_STATUS = 'N'
+	WHERE EVENT_NO = ?
+	</entry>
+</properties>
